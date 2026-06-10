@@ -51,4 +51,5 @@ Simply double-click the `.exe` or run it from the command line. The bot will ask
 1. **Username**: The guns.lol profile you want to bot.
 2. **Threads**: How many concurrent connections to run. 
 
+⚠️ keep in mind that guns.lol takes about 10mins to sync and display the new views.
 Enjoy the views!
