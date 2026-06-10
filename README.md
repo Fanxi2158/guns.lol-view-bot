@@ -1,6 +1,7 @@
 # ⚠️ Released at 40 Stars! ⚠️
 
-![Guns.lol Viewbot](https://i.ibb.co/LzvVZ6kk/ezgif-5e2a950979f4816c.gif)
+<img width="800" height="450" alt="ezgif-5e2a950979f4816c" src="https://github.com/user-attachments/assets/b008e081-9329-4523-898e-631801199acc" />
+
 
 A high-performance, multi-threaded viewbot/solver for guns.lol profiles. It automatically bypasses Cloudflare Turnstile and solves the Proof-of-Work (PoW) challenges using an embedded WASM engine.
 
