@@ -1,0 +1,140 @@
+package main
+
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"math/rand"
+	"net/http"
+)
+
+type SolutionPayload struct {
+	Username          string
+	Underscore2xa     string
+	Nonce             string
+	O09               string
+	Timestamp         int64
+	Oo                string
+	Seal              string
+	TurnstileResponse string
+}
+
+const hexChars = "0123456789abcdef"
+
+var ErrClearanceExpired = errors.New("clearance expired (401)")
+
+func (s *Session) SubmitLinkClick(username, linkID string) error {
+	p := map[string]interface{}{
+		"username":   username,
+		"event":      "click",
+		"linkId":     linkID,
+		"referrer":   "https://guns.lol/" + username,
+		"deviceType": []string{"desktop", "mobile", "tablet"}[rand.Intn(3)],
+	}
+	jsonPayload, err := json.Marshal(p)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest("POST", "https://guns.lol/api/analytics/record", bytes.NewReader(jsonPayload))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("User-Agent", userAgent)
+	if s.Clearance != "" {
+		req.AddCookie(&http.Cookie{Name: "guns_clearance", Value: s.Clearance})
+	}
+	resp, err := s.Client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode == http.StatusUnauthorized {
+		io.ReadAll(resp.Body)
+		return ErrClearanceExpired
+	}
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("status %d: %s", resp.StatusCode, truncateBody(body))
+	}
+	return nil
+}
+
+func (s *Session) SubmitSolution(payload SolutionPayload) error {
+	insertPos1 := int(payload.Timestamp % 10)
+	seal := payload.Seal[:insertPos1] + string(hexChars[rand.Intn(16)]) + payload.Seal[insertPos1:]
+
+	insertPos2 := 16 + int(payload.Timestamp+int64(payload.Nonce[len(payload.Nonce)-1]))%24
+	seal = seal[:insertPos2] + string(hexChars[rand.Intn(16)]) + seal[insertPos2:]
+
+	p := map[string]interface{}{
+		"_t": payload.TurnstileResponse,
+		"_gpp_ch": []interface{}{
+			payload.Underscore2xa,
+			payload.Timestamp,
+			payload.O09,
+			payload.Nonce,
+			seal,
+			payload.Oo,
+		},
+		"username":   payload.Username,
+		"deviceType": []string{"desktop", "mobile"}[rand.Intn(2)],
+		"event":      "view",
+		"linkId":     nil,
+		"referrer":   "https://github.com/glockinhand",
+	}
+	jsonPayload, err := json.Marshal(p)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest("POST", "https://guns.lol/api/analytics/record", bytes.NewReader(jsonPayload))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "text/plain;charset=UTF-8")
+	req.Header.Set("User-Agent", userAgent)
+	req.Header.Set("Origin", "https://guns.lol")
+	req.Header.Set("Referer", "https://guns.lol/"+payload.Username)
+	req.Header.Set("Accept", "*/*")
+	req.Header.Set("Accept-Language", "en-US,en;q=0.9")
+	req.Header.Set("sec-ch-ua", `"Chromium";v="146", "Google Chrome";v="146", "Not.A/Brand";v="99"`)
+	req.Header.Set("sec-ch-ua-mobile", "?0")
+	req.Header.Set("sec-ch-ua-platform", `"Windows"`)
+	req.Header.Set("sec-fetch-site", "same-origin")
+	req.Header.Set("sec-fetch-mode", "cors")
+	req.Header.Set("sec-fetch-dest", "empty")
+
+	req.AddCookie(&http.Cookie{Name: "GUNS_LOCALE", Value: "en"})
+	req.AddCookie(&http.Cookie{Name: "GUNS_PATH_LOCALE", Value: "en"})
+	if s.Clearance != "" {
+		req.AddCookie(&http.Cookie{Name: "guns_clearance", Value: s.Clearance})
+	}
+
+	resp, err := s.Client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	body, _ := io.ReadAll(resp.Body)
+	if resp.StatusCode == http.StatusUnauthorized {
+		return ErrClearanceExpired
+	}
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("status %d: %s", resp.StatusCode, truncateBody(body))
+	}
+
+	return nil
+}
+
+func truncateBody(body []byte) string {
+	s := string(body)
+	if len(s) > 80 {
+		return s[:80] + "..."
+	}
+	return s
+}

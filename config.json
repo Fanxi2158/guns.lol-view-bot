@@ -1,0 +1,5 @@
+{
+  "_comment_solver_service": "you can choose from capsolver or capmonster, enter it below.",
+  "solver_service": "capsolver",
+  "api_key": "ur api key here"
+}
